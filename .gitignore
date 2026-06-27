@@ -20,9 +20,9 @@ android/pubspec.lock
 # Local release staging
 release-artifacts/
 
+# Audit reports
+audit-report.md
+
 # IDE
 .idea/
-
-
-#Ignore vscode AI rules
-.github\instructions\codacy.instructions.md
+.vscode/settings.json

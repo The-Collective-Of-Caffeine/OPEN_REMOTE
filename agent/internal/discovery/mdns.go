@@ -94,7 +94,7 @@ func (s *Service) txtRecords() []string {
 		"ws_path=" + s.config.WebSocketPath,
 		"http_port=" + strconv.Itoa(s.config.Port),
 	}
-	if s.wakeTarget.Valid() {
+	if s.wakeTarget.Valid() && s.config.AdvertiseWakeOnLAN {
 		records = append(
 			records,
 			"wake_mac="+s.wakeTarget.MAC,

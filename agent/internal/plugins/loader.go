@@ -187,22 +187,16 @@ func loadExternalPlugin(manifestPath string, logger *log.Logger) (Plugin, error)
 }
 
 func resolveExecutable(value string, baseDir string) (string, error) {
-	if filepath.IsAbs(value) {
-		return value, nil
+	resolved := filepath.Join(baseDir, value)
+	clean := filepath.Clean(resolved)
+	if !strings.HasPrefix(clean, filepath.Clean(baseDir)+string(filepath.Separator)) &&
+		clean != filepath.Clean(baseDir) {
+		return "", fmt.Errorf("executable path %q escapes plugin directory", value)
 	}
-	if strings.ContainsRune(value, filepath.Separator) || strings.Contains(value, "/") {
-		resolved := filepath.Join(baseDir, value)
-		if _, err := os.Stat(resolved); err != nil {
-			return "", err
-		}
-		return resolved, nil
+	if _, err := os.Stat(clean); err != nil {
+		return "", fmt.Errorf("executable not found: %w", err)
 	}
-
-	resolved, err := exec.LookPath(value)
-	if err != nil {
-		return "", err
-	}
-	return resolved, nil
+	return clean, nil
 }
 
 func (p *ExternalPlugin) ID() string {

@@ -15,6 +15,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/gorilla/websocket"
 	"github.com/skip2/go-qrcode"
 	"openremote/agent/internal/config"
 	"openremote/agent/internal/discovery"
@@ -33,6 +34,7 @@ type Application struct {
 	authorizer   *Authorizer
 	discovery    *discovery.Service
 	executor     *system.Executor
+	upgrader     websocket.Upgrader
 }
 
 func NewApplication(
@@ -57,6 +59,7 @@ func NewApplication(
 		authorizer:   authorizer,
 		discovery:    discoveryService,
 		executor:     executor,
+		upgrader:     newUpgrader(cfg.AllowedOrigins),
 	}
 }
 
@@ -91,6 +94,10 @@ func (a *Application) ListenAndServe(ctx context.Context) error {
 		}()
 	}
 
+	if a.config.TLSCertFile != "" && a.config.TLSKeyFile != "" {
+		a.logger.Printf("https server listening on %s", server.Addr)
+		return server.ListenAndServeTLS(a.config.TLSCertFile, a.config.TLSKeyFile)
+	}
 	a.logger.Printf("http server listening on %s", server.Addr)
 	return server.ListenAndServe()
 }

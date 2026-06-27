@@ -2,6 +2,7 @@ package server
 
 import (
 	"crypto/rand"
+	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
@@ -61,11 +62,12 @@ func (a *Authorizer) ExchangePairingToken(pairingManager *pairing.Manager, pairi
 		return TrustedDevice{}, err
 	}
 
+	tokenHash := hashToken(accessToken)
 	now := time.Now().UTC()
 	device := TrustedDevice{
 		ID:        deviceID,
 		Name:      deviceName,
-		Token:     accessToken,
+		Token:     tokenHash,
 		LastSeen:  now,
 		CreatedAt: now,
 	}
@@ -74,6 +76,9 @@ func (a *Authorizer) ExchangePairingToken(pairingManager *pairing.Manager, pairi
 	defer a.mu.Unlock()
 
 	a.devices[device.Token] = device
+
+	// Return the raw token to the client; only the hash is persisted.
+	device.Token = accessToken
 	if err := a.persistLocked(); err != nil {
 		return TrustedDevice{}, err
 	}
@@ -103,7 +108,7 @@ func (a *Authorizer) AuthenticateToken(token string) (TrustedDevice, bool) {
 	a.mu.Lock()
 	defer a.mu.Unlock()
 
-	device, ok := a.devices[token]
+	device, ok := a.devices[hashToken(token)]
 	if !ok {
 		return TrustedDevice{}, false
 	}
@@ -156,6 +161,10 @@ func (a *Authorizer) load() error {
 	}
 
 	for _, device := range devices {
+		// Migrate raw tokens (16-byte hex = 32 chars) to hashed tokens (64 hex chars).
+		if len(device.Token) == 32 {
+			device.Token = hashToken(device.Token)
+		}
 		a.devices[device.Token] = device
 	}
 
@@ -174,6 +183,11 @@ func (a *Authorizer) persistLocked() error {
 	}
 
 	return os.WriteFile(a.path, blob, 0o644)
+}
+
+func hashToken(token string) string {
+	sum := sha256.Sum256([]byte(token))
+	return hex.EncodeToString(sum[:])
 }
 
 func randomHex(size int) (string, error) {

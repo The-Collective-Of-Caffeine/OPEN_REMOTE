@@ -6,7 +6,7 @@ OpenRemote is a monorepo implementation for an open-source alternative to Unifie
 - A Flutter-based Android client that discovers agents, renders remotes, and sends commands.
 - A protocol, remote definition format, and SDK surface that let new remotes and plugins ship without rewriting the whole stack.
 
-The repository is generated from the product brief in [`CHAT.md`](/j:/SCRIPTS/OPEN_REMOTE/CHAT.md) and turns that conversation into a concrete starter layout.
+The repository is generated from the product brief in [`CHAT.md`](./CHAT.md) and turns that conversation into a concrete starter layout.
 
 ## Repository Map
 
@@ -73,15 +73,15 @@ The Android client now includes a generated native Android project plus pair-URI
 
 ## Primary Docs
 
-- [`docs/architecture.md`](/j:/SCRIPTS/OPEN_REMOTE/docs/architecture.md)
-- [`docs/agent-server.md`](/j:/SCRIPTS/OPEN_REMOTE/docs/agent-server.md)
-- [`docs/android-client.md`](/j:/SCRIPTS/OPEN_REMOTE/docs/android-client.md)
-- [`docs/pairing.md`](/j:/SCRIPTS/OPEN_REMOTE/docs/pairing.md)
-- [`docs/protocol.md`](/j:/SCRIPTS/OPEN_REMOTE/docs/protocol.md)
-- [`docs/plugin-sdk.md`](/j:/SCRIPTS/OPEN_REMOTE/docs/plugin-sdk.md)
-- [`docs/remote-designer.md`](/j:/SCRIPTS/OPEN_REMOTE/docs/remote-designer.md)
-- [`docs/security.md`](/j:/SCRIPTS/OPEN_REMOTE/docs/security.md)
-- [`docs/roadmap.md`](/j:/SCRIPTS/OPEN_REMOTE/docs/roadmap.md)
+- [`docs/architecture.md`](./docs/architecture.md)
+- [`docs/agent-server.md`](./docs/agent-server.md)
+- [`docs/android-client.md`](./docs/android-client.md)
+- [`docs/pairing.md`](./docs/pairing.md)
+- [`docs/protocol.md`](./docs/protocol.md)
+- [`docs/plugin-sdk.md`](./docs/plugin-sdk.md)
+- [`docs/remote-designer.md`](./docs/remote-designer.md)
+- [`docs/security.md`](./docs/security.md)
+- [`docs/roadmap.md`](./docs/roadmap.md)
 
 ## Design Principles
 

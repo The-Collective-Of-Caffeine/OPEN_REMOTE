@@ -4,4 +4,9 @@ analyzer:
 
 linter:
   rules:
-    avoid_print: true
+    - avoid_print
+    - prefer_const_constructors
+    - prefer_const_declarations
+    - prefer_final_locals
+    - avoid_unused_constructor_parameters
+    - unnecessary_brace_in_string_interps

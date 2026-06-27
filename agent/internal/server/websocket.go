@@ -9,10 +9,24 @@ import (
 	"openremote/agent/internal/plugins"
 )
 
-var upgrader = websocket.Upgrader{
-	CheckOrigin: func(_ *http.Request) bool {
-		return true
-	},
+func newUpgrader(allowedOrigins []string) websocket.Upgrader {
+	return websocket.Upgrader{
+		CheckOrigin: func(request *http.Request) bool {
+			if len(allowedOrigins) == 0 {
+				return false
+			}
+			origin := request.Header.Get("Origin")
+			if origin == "" {
+				return false
+			}
+			for _, allowed := range allowedOrigins {
+				if allowed == "*" || origin == allowed {
+					return true
+				}
+			}
+			return false
+		},
+	}
 }
 
 const (
@@ -30,7 +44,7 @@ func (a *Application) handleWebSocket(writer http.ResponseWriter, request *http.
 		return
 	}
 
-	conn, err := upgrader.Upgrade(writer, request, nil)
+	conn, err := a.upgrader.Upgrade(writer, request, nil)
 	if err != nil {
 		a.logger.Printf("websocket upgrade failed: %v", err)
 		return

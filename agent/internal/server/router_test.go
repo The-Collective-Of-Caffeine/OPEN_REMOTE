@@ -478,7 +478,7 @@ func authorizeTestToken(t *testing.T, authorizer *Authorizer) string {
 		LastSeen:  time.Now().UTC(),
 		CreatedAt: time.Now().UTC(),
 	}
-	authorizer.devices[device.Token] = device
+	authorizer.devices[hashToken(device.Token)] = device
 	if err := authorizer.persistLocked(); err != nil {
 		t.Fatalf("persistLocked() error = %v", err)
 	}

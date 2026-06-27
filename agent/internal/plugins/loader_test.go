@@ -56,23 +56,17 @@ func TestLoadExternalPlugins(t *testing.T) {
 
 func testPluginCommand(pluginDir string) (string, []string, string) {
 	if runtime.GOOS == "windows" {
-		scriptPath := filepath.Join(pluginDir, "plugin.ps1")
-		return "powershell.exe", []string{
-			"-NoProfile",
-			"-ExecutionPolicy",
-			"Bypass",
-			"-File",
-			scriptPath,
-		}, scriptPath
+		scriptPath := filepath.Join(pluginDir, "plugin.cmd")
+		return "plugin.cmd", nil, scriptPath
 	}
 
 	scriptPath := filepath.Join(pluginDir, "plugin.sh")
-	return "sh", []string{scriptPath}, scriptPath
+	return "plugin.sh", nil, scriptPath
 }
 
 func testPluginScript() string {
 	if runtime.GOOS == "windows" {
-		return "$input | Out-Null\nexit 0\n"
+		return "@echo off\r\nexit /b 0\r\n"
 	}
 
 	return "#!/bin/sh\ncat >/dev/null\nexit 0\n"

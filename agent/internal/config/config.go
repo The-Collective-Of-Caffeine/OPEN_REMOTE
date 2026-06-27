@@ -11,23 +11,27 @@ import (
 )
 
 type Config struct {
-	AppName       string
-	DeviceName    string
-	ListenAddress string
-	PublicHost    string
-	Port          int
-	PairingTTL    time.Duration
-	PairingScheme string
-	WebSocketPath string
-	ServiceType   string
-	DataDir       string
-	RemotesDir    string
-	PluginsDir    string
-	UploadsDir    string
-	OpenPairingUI bool
-	WakeMAC       string
-	WakeBroadcast string
-	WakePort      int
+	AppName         string
+	DeviceName      string
+	ListenAddress   string
+	PublicHost      string
+	Port            int
+	PairingTTL      time.Duration
+	PairingScheme   string
+	WebSocketPath   string
+	ServiceType     string
+	DataDir         string
+	RemotesDir      string
+	PluginsDir      string
+	UploadsDir      string
+	OpenPairingUI   bool
+	WakeMAC             string
+	WakeBroadcast       string
+	WakePort            int
+	AdvertiseWakeOnLAN  bool
+	TLSCertFile         string
+	TLSKeyFile      string
+	AllowedOrigins  []string
 }
 
 func Load() (Config, error) {
@@ -52,23 +56,27 @@ func Load() (Config, error) {
 	}
 
 	return Config{
-		AppName:       "OpenRemote Agent",
-		DeviceName:    envString("OPENREMOTE_DEVICE_NAME", hostname),
-		ListenAddress: envString("OPENREMOTE_LISTEN_ADDRESS", "0.0.0.0"),
-		PublicHost:    envString("OPENREMOTE_PUBLIC_HOST", defaultPublicHost(hostname)),
-		Port:          port,
-		PairingTTL:    pairingTTL,
-		PairingScheme: envString("OPENREMOTE_PAIRING_SCHEME", "openremote"),
-		WebSocketPath: envString("OPENREMOTE_WEBSOCKET_PATH", "/ws"),
-		ServiceType:   envString("OPENREMOTE_SERVICE_TYPE", "_openremote._tcp"),
-		DataDir:       envString("OPENREMOTE_DATA_DIR", "data"),
-		RemotesDir:    resolveAssetDir("OPENREMOTE_REMOTES_DIR", "remotes"),
-		PluginsDir:    resolveAssetDir("OPENREMOTE_PLUGINS_DIR", "plugins"),
-		UploadsDir:    envString("OPENREMOTE_UPLOADS_DIR", filepath.Clean(filepath.Join("data", "uploads"))),
-		OpenPairingUI: envBool("OPENREMOTE_OPEN_PAIRING_UI", false),
-		WakeMAC:       envString("OPENREMOTE_WOL_MAC", ""),
-		WakeBroadcast: envString("OPENREMOTE_WOL_BROADCAST", ""),
-		WakePort:      wakePort,
+		AppName:         "OpenRemote Agent",
+		DeviceName:      envString("OPENREMOTE_DEVICE_NAME", hostname),
+		ListenAddress:   envString("OPENREMOTE_LISTEN_ADDRESS", "0.0.0.0"),
+		PublicHost:      envString("OPENREMOTE_PUBLIC_HOST", defaultPublicHost(hostname)),
+		Port:            port,
+		PairingTTL:      pairingTTL,
+		PairingScheme:   envString("OPENREMOTE_PAIRING_SCHEME", "openremote"),
+		WebSocketPath:   envString("OPENREMOTE_WEBSOCKET_PATH", "/ws"),
+		ServiceType:     envString("OPENREMOTE_SERVICE_TYPE", "_openremote._tcp"),
+		DataDir:         envString("OPENREMOTE_DATA_DIR", "data"),
+		RemotesDir:      resolveAssetDir("OPENREMOTE_REMOTES_DIR", "remotes"),
+		PluginsDir:      resolveAssetDir("OPENREMOTE_PLUGINS_DIR", "plugins"),
+		UploadsDir:      envString("OPENREMOTE_UPLOADS_DIR", filepath.Clean(filepath.Join("data", "uploads"))),
+		OpenPairingUI:   envBool("OPENREMOTE_OPEN_PAIRING_UI", false),
+		WakeMAC:             envString("OPENREMOTE_WOL_MAC", ""),
+		WakeBroadcast:       envString("OPENREMOTE_WOL_BROADCAST", ""),
+		WakePort:            wakePort,
+		AdvertiseWakeOnLAN:  envBool("OPENREMOTE_ADVERTISE_WOL", false),
+		TLSCertFile:         envString("OPENREMOTE_TLS_CERT", ""),
+		TLSKeyFile:      envString("OPENREMOTE_TLS_KEY", ""),
+		AllowedOrigins:  envList("OPENREMOTE_ALLOWED_ORIGINS"),
 	}, nil
 }
 
@@ -107,6 +115,22 @@ func envDuration(name string, fallback time.Duration) (time.Duration, error) {
 	}
 
 	return value, nil
+}
+
+func envList(name string) []string {
+	raw := os.Getenv(name)
+	if raw == "" {
+		return nil
+	}
+	parts := strings.Split(raw, ",")
+	result := make([]string, 0, len(parts))
+	for _, p := range parts {
+		trimmed := strings.TrimSpace(p)
+		if trimmed != "" {
+			result = append(result, trimmed)
+		}
+	}
+	return result
 }
 
 func envBool(name string, fallback bool) bool {
